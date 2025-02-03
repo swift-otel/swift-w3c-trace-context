@@ -3,8 +3,7 @@
 ##
 ## This source file is part of the Swift W3C TraceContext open source project
 ##
-## Copyright (c) 2024 Moritz Lang and the Swift W3C TraceContext project
-## authors
+## Copyright (c) 2024 the Swift W3C TraceContext project authors
 ## Licensed under Apache License v2.0
 ##
 ## See LICENSE.txt for license information
@@ -54,8 +53,7 @@ for language in swift-or-c bash dtrace; do
 //
 // This source file is part of the Swift W3C TraceContext open source project
 //
-// Copyright (c) YEARS Moritz Lang and the Swift W3C TraceContext project
-// authors
+// Copyright (c) YEARS the Swift W3C TraceContext project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -73,8 +71,7 @@ EOF
 ##
 ## This source file is part of the Swift W3C TraceContext open source project
 ##
-## Copyright (c) YEARS Moritz Lang and the Swift W3C TraceContext project
-## authors
+## Copyright (c) YEARS the Swift W3C TraceContext project authors
 ## Licensed under Apache License v2.0
 ##
 ## See LICENSE.txt for license information
@@ -92,8 +89,7 @@ EOF
  *
  *  This source file is part of the Swift W3C TraceContext open source project
  *
- *  Copyright (c) YEARS Moritz Lang and the Swift W3C TraceContext project
- *  authors
+ *  Copyright (c) YEARS the Swift W3C TraceContext project authors
  *  Licensed under Apache License v2.0
  *
  *  See LICENSE.txt for license information

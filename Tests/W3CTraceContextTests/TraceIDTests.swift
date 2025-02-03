@@ -2,8 +2,7 @@
 //
 // This source file is part of the Swift W3C TraceContext open source project
 //
-// Copyright (c) 2024 Moritz Lang and the Swift W3C TraceContext project
-// authors
+// Copyright (c) 2024 the Swift W3C TraceContext project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
