@@ -1,7 +1,12 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.0
 import PackageDescription
 
-let swiftSettings: [SwiftSetting] = [.enableExperimentalFeature("StrictConcurrency=complete")]
+let swiftSettings: [SwiftSetting] = [
+    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("MemberImportVisibility"),
+    .enableUpcomingFeature("InternalImportsByDefault"),
+    .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+]
 
 let package = Package(
     name: "swift-w3c-trace-context",
@@ -24,6 +29,5 @@ let package = Package(
             dependencies: [.target(name: "W3CTraceContext")],
             swiftSettings: swiftSettings
         ),
-    ],
-    swiftLanguageVersions: [.version("6"), .v5]
+    ]
 )
