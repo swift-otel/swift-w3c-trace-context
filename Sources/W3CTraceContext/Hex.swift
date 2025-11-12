@@ -11,10 +11,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-@_spi(Hex)
-public enum Hex {
+enum Hex {
     /// A lockup table for fast conversion of bytes to hex-bytes.
-    public static let lookup = [
+    static let lookup = [
         UInt8(ascii: "0"), UInt8(ascii: "1"), UInt8(ascii: "2"), UInt8(ascii: "3"),
         UInt8(ascii: "4"), UInt8(ascii: "5"), UInt8(ascii: "6"), UInt8(ascii: "7"),
         UInt8(ascii: "8"), UInt8(ascii: "9"), UInt8(ascii: "a"), UInt8(ascii: "b"),
@@ -28,7 +27,7 @@ public enum Hex {
     /// - Parameters:
     ///   - ascii: The ASCII bytes to convert.
     ///   - target: The pointer to store the converted bytes into.
-    public static func convert<T>(
+    static func convert<T>(
         _ ascii: T,
         toBytes target: UnsafeMutableRawBufferPointer
     ) where T: RandomAccessCollection, T.Element == UInt8 {
