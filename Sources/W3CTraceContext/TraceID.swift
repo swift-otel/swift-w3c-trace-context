@@ -15,9 +15,8 @@
 ///
 /// [W3C TraceContext: trace-id](https://www.w3.org/TR/trace-context-1/#trace-id)
 public struct TraceID: Sendable {
-
     @usableFromInline
-    internal var _bytes: Bytes
+    var _bytes: Bytes
 
     /// The 16 bytes making up the trace ID.
     public var bytes: Bytes {
@@ -28,7 +27,7 @@ public struct TraceID: Sendable {
     ///
     /// - Parameter bytes: The 16 bytes making up the trace ID.
     public init(bytes: Bytes) {
-        self._bytes = bytes
+        _bytes = bytes
     }
 
     /// Create a random trace ID using the given random number generator.
@@ -94,13 +93,12 @@ extension TraceID: Identifiable {
 // MARK: - Bytes
 
 extension TraceID {
-    
     /// A 16-byte array.
     public typealias Bytes = (
         UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8,
         UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8
     )
-    
+
     /// A trace ID with all zeros.
     @inlinable
     public static var null: Self {
@@ -108,13 +106,11 @@ extension TraceID {
     }
 }
 
-
 // Note: The spans below are provided in a closure, instead of returned, because as of
 // Swift 6.2 we're still missing the lifetime features to spell it out correctly.
 // In the future, we should add the Span/MutableSpan-returning methods and deprecate
 // the closure-taking ones.
 extension TraceID {
-
     /// Provides safe, read-only access to the underlying memory.
     /// - Parameter body: The closure within you read the provided span.
     @inlinable public func withSpan<Result: ~Copyable>(

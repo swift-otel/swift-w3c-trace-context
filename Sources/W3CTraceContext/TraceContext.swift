@@ -93,7 +93,7 @@ public struct TraceContext: Sendable {
         // flags
 
         let traceFlagsRawValue = Hex.convert(
-            major: traceParent[53], 
+            major: traceParent[53],
             minor: traceParent[54]
         )
         let flags = TraceFlags(rawValue: traceFlagsRawValue)

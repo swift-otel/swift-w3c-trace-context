@@ -15,9 +15,8 @@
 ///
 /// [W3C TraceContext: parent-id](https://www.w3.org/TR/trace-context-1/#parent-id)
 public struct SpanID: Sendable {
-
     @usableFromInline
-    internal var _bytes: Bytes
+    var _bytes: Bytes
 
     /// The 8 bytes making up the span ID.
     public var bytes: Bytes {
@@ -28,7 +27,7 @@ public struct SpanID: Sendable {
     ///
     /// - Parameter bytes: The 8 bytes making up the span ID.
     public init(bytes: Bytes) {
-        self._bytes = bytes
+        _bytes = bytes
     }
 
     /// Create a random span ID using the given random number generator.
@@ -89,8 +88,8 @@ extension SpanID: Identifiable {
 }
 
 // MARK: - Bytes
-extension SpanID {
 
+extension SpanID {
     /// An 8-byte array.
     public typealias Bytes = (UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8)
 
@@ -106,7 +105,6 @@ extension SpanID {
 // In the future, we should add the Span/MutableSpan-returning methods and deprecate
 // the closure-taking ones.
 extension SpanID {
-
     /// Provides safe, read-only access to the underlying memory.
     /// - Parameter body: The closure within you read the provided span.
     @inlinable public func withSpan<Result: ~Copyable>(
@@ -142,7 +140,6 @@ extension SpanID {
 }
 
 extension SpanID: CustomStringConvertible {
-
     /// A 16 character hex string representation of the span ID.
     public var description: String {
         String(decoding: hexBytes, as: UTF8.self)

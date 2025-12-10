@@ -14,7 +14,7 @@
 import XCTest
 
 func XCTAssertEqualUInt8Spans(
-    _ lhs: Span<UInt8>, 
+    _ lhs: Span<UInt8>,
     _ rhs: Span<UInt8>,
     file: StaticString = #filePath,
     line: UInt = #line
