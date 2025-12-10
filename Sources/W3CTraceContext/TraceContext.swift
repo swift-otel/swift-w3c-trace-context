@@ -68,11 +68,11 @@ public struct TraceContext: Sendable {
 
         // trace ID
 
-        var traceIDBytes = TraceID.Bytes.null
-        withUnsafeMutableBytes(of: &traceIDBytes) { ptr in
-            Hex.convert(traceParent[3 ..< 35], toBytes: ptr)
+        var traceID = TraceID.null
+        traceID.withMutableSpan { span in
+            Hex.convert(traceParent[3 ..< 35], toBytes: &span)
         }
-        if traceIDBytes == .null {
+        if traceID == .null {
             throw TraceParentDecodingError(
                 .invalidTraceID(String(decoding: traceParent[3 ..< 35], as: UTF8.self))
             )
@@ -80,11 +80,11 @@ public struct TraceContext: Sendable {
 
         // span ID
 
-        var spanIDBytes = SpanID.Bytes.null
-        spanIDBytes.withUnsafeMutableBytes { ptr in
-            Hex.convert(traceParent[36 ..< 52], toBytes: ptr)
+        var spanID = SpanID.null
+        spanID.withMutableSpan { span in
+            Hex.convert(traceParent[36 ..< 52], toBytes: &span)
         }
-        if spanIDBytes == .null {
+        if spanID == .null {
             throw TraceParentDecodingError(
                 .invalidSpanID(String(decoding: traceParent[36 ..< 52], as: UTF8.self))
             )
@@ -92,10 +92,10 @@ public struct TraceContext: Sendable {
 
         // flags
 
-        var traceFlagsRawValue: UInt8 = 0
-        withUnsafeMutableBytes(of: &traceFlagsRawValue) { ptr in
-            Hex.convert(traceParent[53 ..< 55], toBytes: ptr)
-        }
+        let traceFlagsRawValue = Hex.convert(
+            major: traceParent[53], 
+            minor: traceParent[54]
+        )
         let flags = TraceFlags(rawValue: traceFlagsRawValue)
 
         let state: TraceState = if let traceStateHeaderValue, !traceStateHeaderValue.isEmpty {
@@ -105,8 +105,8 @@ public struct TraceContext: Sendable {
         }
 
         self = TraceContext(
-            traceID: TraceID(bytes: traceIDBytes),
-            spanID: SpanID(bytes: spanIDBytes),
+            traceID: traceID,
+            spanID: spanID,
             flags: flags,
             state: state
         )
@@ -136,7 +136,7 @@ public struct TraceContext: Sendable {
 extension TraceContext: Hashable {}
 
 /// An error thrown while decoding a malformed trace parent header.
-public struct TraceParentDecodingError: Error {
+package struct TraceParentDecodingError: Error {
     package let reason: Reason
 
     init(_ reason: Reason) {

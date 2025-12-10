@@ -26,10 +26,10 @@ enum Hex {
     ///
     /// - Parameters:
     ///   - ascii: The ASCII bytes to convert.
-    ///   - target: The pointer to store the converted bytes into.
+    ///   - target: The mutable span to store the converted bytes into.
     static func convert<T>(
         _ ascii: T,
-        toBytes target: UnsafeMutableRawBufferPointer
+        toBytes target: inout MutableSpan<UInt8>
     ) where T: RandomAccessCollection, T.Element == UInt8 {
         assert(ascii.count / 2 == target.count, "Target needs half as much space as ascii")
 
@@ -37,28 +37,41 @@ enum Hex {
         var targetIndex = 0
 
         while let major = source.next(), let minor = source.next() {
-            var byte: UInt8 = 0
-
-            switch major {
-            case UInt8(ascii: "0") ... UInt8(ascii: "9"):
-                byte = (major - UInt8(ascii: "0")) << 4
-            case UInt8(ascii: "a") ... UInt8(ascii: "f"):
-                byte = (major - UInt8(ascii: "a") + 10) << 4
-            default:
-                preconditionFailure()
-            }
-
-            switch minor {
-            case UInt8(ascii: "0") ... UInt8(ascii: "9"):
-                byte |= (minor - UInt8(ascii: "0"))
-            case UInt8(ascii: "a") ... UInt8(ascii: "f"):
-                byte |= (minor - UInt8(ascii: "a") + 10)
-            default:
-                preconditionFailure()
-            }
-
+            let byte = convert(major: major, minor: minor)
             target[targetIndex] = byte
             targetIndex += 1
         }
+    }
+
+    /// Convert the given two ASCII characters into bytes stored in the given target.
+    ///
+    /// - Parameters:
+    ///   - major: The major ASCII character.
+    ///   - minor: The minor ASCII character.
+    static func convert(
+        major: UInt8,
+        minor: UInt8,
+    ) -> UInt8 {
+        var byte: UInt8 = 0
+
+        switch major {
+        case UInt8(ascii: "0") ... UInt8(ascii: "9"):
+            byte = (major - UInt8(ascii: "0")) << 4
+        case UInt8(ascii: "a") ... UInt8(ascii: "f"):
+            byte = (major - UInt8(ascii: "a") + 10) << 4
+        default:
+            preconditionFailure()
+        }
+
+        switch minor {
+        case UInt8(ascii: "0") ... UInt8(ascii: "9"):
+            byte |= (minor - UInt8(ascii: "0"))
+        case UInt8(ascii: "a") ... UInt8(ascii: "f"):
+            byte |= (minor - UInt8(ascii: "a") + 10)
+        default:
+            preconditionFailure()
+        }
+
+        return byte
     }
 }

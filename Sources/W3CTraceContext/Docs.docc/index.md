@@ -17,8 +17,3 @@ context propagation, implementing the [W3C Trace Context](https://www.w3.org/TR/
 - ``TraceID``
 - ``TraceFlags``
 - ``TraceState``
-
-### Decoding headers
-
-- ``TraceParentDecodingError``
-- ``TraceStateDecodingError``

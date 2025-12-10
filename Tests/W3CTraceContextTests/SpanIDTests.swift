@@ -2,7 +2,7 @@
 //
 // This source file is part of the Swift W3C TraceContext open source project
 //
-// Copyright (c) 2024 the Swift W3C TraceContext project authors
+// Copyright (c) 2024-2025 the Swift W3C TraceContext project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -15,15 +15,15 @@ import W3CTraceContext
 import XCTest
 
 final class SpanIDTests: XCTestCase {
-    func test_bytes_returnsEightByteArrayRepresentation() {
+    func test_initFromBytes() {
         let spanID = SpanID.oneToEight
 
-        XCTAssertEqual(Array(spanID.bytes), [1, 2, 3, 4, 5, 6, 7, 8])
+        XCTAssertEqual(spanID, SpanID(bytes: (1, 2, 3, 4, 5, 6, 7, 8)))
     }
 
     func test_equatableConformance() {
-        let spanID1 = SpanID(bytes: .init((1, 2, 3, 4, 5, 6, 7, 8)))
-        let spanID2 = SpanID(bytes: .init((1, 2, 3, 4, 5, 6, 7, 0)))
+        let spanID1 = SpanID(bytes: (1, 2, 3, 4, 5, 6, 7, 8))
+        let spanID2 = SpanID(bytes: (1, 2, 3, 4, 5, 6, 7, 0))
 
         XCTAssertEqual(spanID1, spanID1)
         XCTAssertEqual(spanID2, spanID2)
@@ -37,7 +37,7 @@ final class SpanIDTests: XCTestCase {
     }
 
     func test_description_returnsHexStringRepresentation() {
-        let spanID = SpanID(bytes: .init((0, 10, 20, 50, 100, 150, 200, 255)))
+        let spanID = SpanID(bytes: (0, 10, 20, 50, 100, 150, 200, 255))
 
         XCTAssertEqual("\(spanID)", "000a14326496c8ff")
     }
@@ -46,10 +46,10 @@ final class SpanIDTests: XCTestCase {
         var generator = IncrementingRandomNumberGenerator()
 
         let spanID1 = SpanID.random(using: &generator)
-        XCTAssertEqual(spanID1, SpanID(bytes: .init((0, 0, 0, 0, 0, 0, 0, 0))))
+        XCTAssertEqual(spanID1, SpanID(bytes: (0, 0, 0, 0, 0, 0, 0, 0)))
 
         let spanID2 = SpanID.random(using: &generator)
-        XCTAssertEqual(spanID2, SpanID(bytes: .init((0, 0, 0, 0, 0, 0, 0, 1))))
+        XCTAssertEqual(spanID2, SpanID(bytes: (0, 0, 0, 0, 0, 0, 0, 1)))
     }
 
     func test_random_withDefaultNumberGenerator_returnsRandomSpanIDs() {
@@ -60,32 +60,24 @@ final class SpanIDTests: XCTestCase {
 
     // MARK: - Bytes
 
-    func test_spanIDBytes_withUnsafeBytes_invokesClosureWithPointerToBytes() {
-        let bytes = SpanID.Bytes((0, 10, 20, 50, 100, 150, 200, 255))
-
-        let byteArray = bytes.withUnsafeBytes { ptr in
-            Array(ptr)
+    @available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
+    func test_bytes_span() {
+        let id = SpanID(bytes: (0, 10, 20, 50, 100, 150, 200, 255))
+        let expectedBytes: [UInt8] = [0, 10, 20, 50, 100, 150, 200, 255]
+        id.withSpan { idSpan in
+            XCTAssertEqualUInt8Spans(idSpan, expectedBytes.span)
         }
-        XCTAssertEqual(byteArray, [0, 10, 20, 50, 100, 150, 200, 255])
     }
 
-    func test_spanIDBytes_withUnsafeMutableBytes_allowsMutatingBytesViaClosure() {
-        var bytes = SpanID.Bytes((0, 10, 20, 50, 100, 150, 200, 255))
-
-        bytes.withUnsafeMutableBytes { ptr in
-            ptr.storeBytes(of: 42, as: UInt8.self)
+    @available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
+    func test_bytes_mutableSpan() {
+        var id = SpanID(bytes: (0, 10, 20, 50, 100, 150, 200, 255))
+        id.withMutableSpan { idSpan in
+            idSpan[0] = 42
         }
-
-        XCTAssertEqual(Array(bytes), [42, 10, 20, 50, 100, 150, 200, 255])
-    }
-
-    func test_withContiguousStorageIfAvailable_invokesClosureWithPointerToBytes() {
-        let bytes = SpanID.Bytes((0, 10, 20, 50, 100, 150, 200, 255))
-
-        let byteArray = bytes.withContiguousStorageIfAvailable { ptr in
-            Array(ptr)
+        let expectedBytes: [UInt8] = [42, 10, 20, 50, 100, 150, 200, 255]
+        id.withSpan { idSpan in
+            XCTAssertEqualUInt8Spans(idSpan, expectedBytes.span)
         }
-
-        XCTAssertEqual(byteArray, [0, 10, 20, 50, 100, 150, 200, 255])
     }
 }

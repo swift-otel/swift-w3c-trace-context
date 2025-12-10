@@ -229,11 +229,11 @@ extension TraceState {
 }
 
 /// Errors thrown while decoding a malformed trace state header.
-public struct TraceStateDecodingError: Error, CustomDebugStringConvertible {
+package struct TraceStateDecodingError: Error, CustomDebugStringConvertible {
     package let reason: Reason
     package let headerValue: String
 
-    public var debugDescription: String {
+    package var debugDescription: String {
         switch reason {
         case .malformedCharacterInVendor(let characterIndex):
             let index = characterIndex.utf16Offset(in: headerValue)
