@@ -19,6 +19,22 @@ final class TraceIDTests: XCTestCase {
         let traceID = TraceID.oneToSixteen
 
         XCTAssertEqual(traceID, TraceID(bytes: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)))
+        XCTAssertEqual(traceID.bytes.0, 1)
+        XCTAssertEqual(traceID.bytes.1, 2)
+        XCTAssertEqual(traceID.bytes.2, 3)
+        XCTAssertEqual(traceID.bytes.3, 4)
+        XCTAssertEqual(traceID.bytes.4, 5)
+        XCTAssertEqual(traceID.bytes.5, 6)
+        XCTAssertEqual(traceID.bytes.6, 7)
+        XCTAssertEqual(traceID.bytes.7, 8)
+        XCTAssertEqual(traceID.bytes.8, 9)
+        XCTAssertEqual(traceID.bytes.9, 10)
+        XCTAssertEqual(traceID.bytes.10, 11)
+        XCTAssertEqual(traceID.bytes.11, 12)
+        XCTAssertEqual(traceID.bytes.12, 13)
+        XCTAssertEqual(traceID.bytes.13, 14)
+        XCTAssertEqual(traceID.bytes.14, 15)
+        XCTAssertEqual(traceID.bytes.15, 16)
     }
 
     func test_equatableConformance() {

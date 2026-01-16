@@ -19,6 +19,14 @@ final class SpanIDTests: XCTestCase {
         let spanID = SpanID.oneToEight
 
         XCTAssertEqual(spanID, SpanID(bytes: (1, 2, 3, 4, 5, 6, 7, 8)))
+        XCTAssertEqual(spanID.bytes.0, 1)
+        XCTAssertEqual(spanID.bytes.1, 2)
+        XCTAssertEqual(spanID.bytes.2, 3)
+        XCTAssertEqual(spanID.bytes.3, 4)
+        XCTAssertEqual(spanID.bytes.4, 5)
+        XCTAssertEqual(spanID.bytes.5, 6)
+        XCTAssertEqual(spanID.bytes.6, 7)
+        XCTAssertEqual(spanID.bytes.7, 8)
     }
 
     func test_equatableConformance() {
