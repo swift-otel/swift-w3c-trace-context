@@ -118,9 +118,8 @@ extension TraceID {
     ) -> Result {
         withUnsafeBytes(of: _bytes) { bytes in
             bytes.withMemoryRebound(to: UInt8.self) { pointer in
-                guard let base = pointer.baseAddress else {
-                    return body(Span())
-                }
+                // Force unwrap is okay as the buffer will never be empty.
+                let base = pointer.baseAddress!
                 let span = Span<UInt8>(_unsafeStart: base, count: 16)
                 return body(span)
             }
@@ -134,10 +133,8 @@ extension TraceID {
     ) throws(Failure) -> Result {
         try withUnsafeMutableBytes(of: &_bytes) { bytes throws(Failure) in
             try bytes.withMemoryRebound(to: UInt8.self) { pointer throws(Failure) in
-                guard let base = pointer.baseAddress else {
-                    var span = MutableSpan<UInt8>()
-                    return try body(&span)
-                }
+                // Force unwrap is okay as the buffer will never be empty.
+                let base = pointer.baseAddress!
                 var span = MutableSpan<UInt8>(_unsafeStart: base, count: 16)
                 return try body(&span)
             }
