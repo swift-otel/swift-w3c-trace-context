@@ -2,7 +2,7 @@
 //
 // This source file is part of the Swift W3C TraceContext open source project
 //
-// Copyright (c) 2024 the Swift W3C TraceContext project authors
+// Copyright (c) 2025 the Swift W3C TraceContext project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -11,9 +11,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-import W3CTraceContext
+import XCTest
 
-extension SpanID {
-    /// A stubbed `SpanID` with bytes from one to eight.
-    static let oneToEight = SpanID(bytes: (1, 2, 3, 4, 5, 6, 7, 8))
+func XCTAssertEqualUInt8Spans(
+    _ lhs: Span<UInt8>,
+    _ rhs: Span<UInt8>,
+    file: StaticString = #filePath,
+    line: UInt = #line
+) {
+    for index in lhs.indices {
+        XCTAssertEqual(lhs[index], rhs[index], "Index: \(index)", file: file, line: line)
+    }
 }

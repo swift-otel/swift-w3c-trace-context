@@ -15,16 +15,31 @@ import W3CTraceContext
 import XCTest
 
 final class TraceIDTests: XCTestCase {
-    func test_bytes_returnsSixteenByteArrayRepresentation() {
+    func test_initFromBytes() {
         let traceID = TraceID.oneToSixteen
 
-        let array = Array(traceID.bytes)
-        XCTAssertEqual(array, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
+        XCTAssertEqual(traceID, TraceID(bytes: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)))
+        XCTAssertEqual(traceID.bytes.0, 1)
+        XCTAssertEqual(traceID.bytes.1, 2)
+        XCTAssertEqual(traceID.bytes.2, 3)
+        XCTAssertEqual(traceID.bytes.3, 4)
+        XCTAssertEqual(traceID.bytes.4, 5)
+        XCTAssertEqual(traceID.bytes.5, 6)
+        XCTAssertEqual(traceID.bytes.6, 7)
+        XCTAssertEqual(traceID.bytes.7, 8)
+        XCTAssertEqual(traceID.bytes.8, 9)
+        XCTAssertEqual(traceID.bytes.9, 10)
+        XCTAssertEqual(traceID.bytes.10, 11)
+        XCTAssertEqual(traceID.bytes.11, 12)
+        XCTAssertEqual(traceID.bytes.12, 13)
+        XCTAssertEqual(traceID.bytes.13, 14)
+        XCTAssertEqual(traceID.bytes.14, 15)
+        XCTAssertEqual(traceID.bytes.15, 16)
     }
 
     func test_equatableConformance() {
-        let traceID1 = TraceID(bytes: .init((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)))
-        let traceID2 = TraceID(bytes: .init((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0)))
+        let traceID1 = TraceID(bytes: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
+        let traceID2 = TraceID(bytes: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0))
 
         XCTAssertEqual(traceID1, traceID1)
         XCTAssertEqual(traceID2, traceID2)
@@ -38,7 +53,7 @@ final class TraceIDTests: XCTestCase {
     }
 
     func test_description_returnsHexStringRepresentation() {
-        let traceID = TraceID(bytes: .init((0, 10, 20, 30, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 255)))
+        let traceID = TraceID(bytes: (0, 10, 20, 30, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 255))
 
         XCTAssertEqual("\(traceID)", "000a141e283c5064788ca0b4c8dcf0ff")
     }
@@ -47,10 +62,10 @@ final class TraceIDTests: XCTestCase {
         var generator = IncrementingRandomNumberGenerator()
 
         let traceID1 = TraceID.random(using: &generator)
-        XCTAssertEqual(traceID1, TraceID(bytes: .init((0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1))))
+        XCTAssertEqual(traceID1, TraceID(bytes: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)))
 
         let traceID2 = TraceID.random(using: &generator)
-        XCTAssertEqual(traceID2, TraceID(bytes: .init((0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3))))
+        XCTAssertEqual(traceID2, TraceID(bytes: (0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3)))
     }
 
     func test_random_withDefaultNumberGenerator_returnsRandomSpanIDs() {
@@ -61,32 +76,24 @@ final class TraceIDTests: XCTestCase {
 
     // MARK: - Bytes
 
-    func test_traceIDBytes_withUnsafeBytes_invokesClosureWithPointerToBytes() {
-        let bytes = TraceID.Bytes((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
-
-        let byteArray = bytes.withUnsafeBytes { ptr in
-            Array(ptr)
+    @available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
+    func test_bytes_span() {
+        let id = TraceID(bytes: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
+        let expectedBytes: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        id.withSpan { idSpan in
+            XCTAssertEqualUInt8Spans(idSpan, expectedBytes.span)
         }
-        XCTAssertEqual(byteArray, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
     }
 
-    func test_traceIDBytes_withUnsafeMutableBytes_allowsMutatingBytesViaClosure() {
-        var bytes = TraceID.Bytes((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
-
-        bytes.withUnsafeMutableBytes { ptr in
-            ptr.storeBytes(of: 42, as: UInt8.self)
+    @available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *)
+    func test_bytes_mutableSpan() {
+        var id = TraceID(bytes: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
+        id.withMutableSpan { idSpan in
+            idSpan[0] = 42
         }
-
-        XCTAssertEqual(Array(bytes), [42, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-    }
-
-    func test_withContiguousStorageIfAvailable_invokesClosureWithPointerToBytes() {
-        let bytes = TraceID.Bytes((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
-
-        let byteArray = bytes.withContiguousStorageIfAvailable { ptr in
-            Array(ptr)
+        let expectedBytes: [UInt8] = [42, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        id.withSpan { idSpan in
+            XCTAssertEqualUInt8Spans(idSpan, expectedBytes.span)
         }
-
-        XCTAssertEqual(byteArray, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
     }
 }
