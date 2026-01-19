@@ -69,8 +69,8 @@ public struct TraceContext: Sendable {
         // trace ID
 
         var traceIDBytes = TraceID.Bytes.null
-        withUnsafeMutableBytes(of: &traceIDBytes) { ptr in
-            Hex.convert(traceParent[3 ..< 35], toBytes: ptr)
+        try withUnsafeMutableBytes(of: &traceIDBytes) { ptr in
+            try Hex.convert(traceParent[3 ..< 35], toBytes: ptr)
         }
         if traceIDBytes == .null {
             throw TraceParentDecodingError(
@@ -81,8 +81,8 @@ public struct TraceContext: Sendable {
         // span ID
 
         var spanIDBytes = SpanID.Bytes.null
-        spanIDBytes.withUnsafeMutableBytes { ptr in
-            Hex.convert(traceParent[36 ..< 52], toBytes: ptr)
+        try spanIDBytes.withUnsafeMutableBytes { ptr in
+            try Hex.convert(traceParent[36 ..< 52], toBytes: ptr)
         }
         if spanIDBytes == .null {
             throw TraceParentDecodingError(
@@ -93,8 +93,8 @@ public struct TraceContext: Sendable {
         // flags
 
         var traceFlagsRawValue: UInt8 = 0
-        withUnsafeMutableBytes(of: &traceFlagsRawValue) { ptr in
-            Hex.convert(traceParent[53 ..< 55], toBytes: ptr)
+        try withUnsafeMutableBytes(of: &traceFlagsRawValue) { ptr in
+            try Hex.convert(traceParent[53 ..< 55], toBytes: ptr)
         }
         let flags = TraceFlags(rawValue: traceFlagsRawValue)
 
@@ -147,6 +147,7 @@ public struct TraceParentDecodingError: Error {
         case invalidTraceParentLength(Int)
         case unsupportedVersion(String)
         case invalidDelimiters
+        case invalidCharacter(UInt8)
         case invalidTraceID(String)
         case invalidSpanID(String)
     }

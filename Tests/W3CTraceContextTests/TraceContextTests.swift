@@ -46,6 +46,39 @@ final class TraceContextTests: XCTestCase {
         ))
     }
 
+    func test_decodingHeaderValues_withInvalidCharacterInTraceID_throwsDecodingError() throws {
+        do {
+            let traceContext = try TraceContext(
+                traceParentHeaderValue: "00-0Af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
+            )
+            XCTFail("Expected decoding error, decoded trace context: \(traceContext)")
+        } catch let error as TraceParentDecodingError {
+            XCTAssertEqual(error.reason, .invalidCharacter(UInt8(ascii: "A")))
+        }
+    }
+
+    func test_decodingHeaderValues_withInvalidCharacterInSpanID_throwsDecodingError() throws {
+        do {
+            let traceContext = try TraceContext(
+                traceParentHeaderValue: "00-0af7651916cd43dd8448eb211c80319c-B7ad6b7169203331-01"
+            )
+            XCTFail("Expected decoding error, decoded trace context: \(traceContext)")
+        } catch let error as TraceParentDecodingError {
+            XCTAssertEqual(error.reason, .invalidCharacter(UInt8(ascii: "B")))
+        }
+    }
+
+    func test_decodingHeaderValues_withInvalidCharacterInFlags_throwsDecodingError() throws {
+        do {
+            let traceContext = try TraceContext(
+                traceParentHeaderValue: "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-0C"
+            )
+            XCTFail("Expected decoding error, decoded trace context: \(traceContext)")
+        } catch let error as TraceParentDecodingError {
+            XCTAssertEqual(error.reason, .invalidCharacter(UInt8(ascii: "C")))
+        }
+    }
+
     func test_decodingHeaderValues_withInvalidLength_throwsDecodingError() throws {
         do {
             let traceContext = try TraceContext(traceParentHeaderValue: String(repeating: "🏎️", count: 100))

@@ -30,7 +30,7 @@ enum Hex {
     static func convert<T>(
         _ ascii: T,
         toBytes target: UnsafeMutableRawBufferPointer
-    ) where T: RandomAccessCollection, T.Element == UInt8 {
+    ) throws where T: RandomAccessCollection, T.Element == UInt8 {
         assert(ascii.count / 2 == target.count, "Target needs half as much space as ascii")
 
         var source = ascii.makeIterator()
@@ -45,7 +45,7 @@ enum Hex {
             case UInt8(ascii: "a") ... UInt8(ascii: "f"):
                 byte = (major - UInt8(ascii: "a") + 10) << 4
             default:
-                preconditionFailure()
+                throw TraceParentDecodingError(.invalidCharacter(major))
             }
 
             switch minor {
@@ -54,7 +54,7 @@ enum Hex {
             case UInt8(ascii: "a") ... UInt8(ascii: "f"):
                 byte |= (minor - UInt8(ascii: "a") + 10)
             default:
-                preconditionFailure()
+                throw TraceParentDecodingError(.invalidCharacter(minor))
             }
 
             target[targetIndex] = byte
