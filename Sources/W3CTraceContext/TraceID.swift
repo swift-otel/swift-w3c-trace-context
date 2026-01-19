@@ -129,17 +129,17 @@ extension TraceID {
 
     /// Provides safe, mutable access to the underlying memory.
     /// - Parameter body: The closure within you read the provided span.
-    @inlinable public mutating func withMutableSpan<Result: ~Copyable>(
-        _ body: (inout MutableSpan<UInt8>) -> Result
-    ) -> Result {
-        withUnsafeMutableBytes(of: &_bytes) { bytes in
-            bytes.withMemoryRebound(to: UInt8.self) { pointer in
+    @inlinable public mutating func withMutableSpan<Failure: Error, Result: ~Copyable>(
+        _ body: (inout MutableSpan<UInt8>) throws(Failure) -> Result
+    ) throws(Failure) -> Result {
+        try withUnsafeMutableBytes(of: &_bytes) { bytes throws(Failure) in
+            try bytes.withMemoryRebound(to: UInt8.self) { pointer throws(Failure) in
                 guard let base = pointer.baseAddress else {
                     var span = MutableSpan<UInt8>()
-                    return body(&span)
+                    return try body(&span)
                 }
                 var span = MutableSpan<UInt8>(_unsafeStart: base, count: 16)
-                return body(&span)
+                return try body(&span)
             }
         }
     }
