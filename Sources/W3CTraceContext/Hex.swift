@@ -30,14 +30,14 @@ enum Hex {
     static func convert<T>(
         _ ascii: T,
         toBytes target: inout MutableSpan<UInt8>
-    ) where T: RandomAccessCollection, T.Element == UInt8 {
+    ) throws where T: RandomAccessCollection, T.Element == UInt8 {
         assert(ascii.count / 2 == target.count, "Target needs half as much space as ascii")
 
         var source = ascii.makeIterator()
         var targetIndex = 0
 
         while let major = source.next(), let minor = source.next() {
-            let byte = convert(major: major, minor: minor)
+            let byte = try convert(major: major, minor: minor)
             target[targetIndex] = byte
             targetIndex += 1
         }
@@ -48,10 +48,11 @@ enum Hex {
     /// - Parameters:
     ///   - major: The major ASCII character.
     ///   - minor: The minor ASCII character.
+    /// - Throws: When encountering an invalid character.
     static func convert(
         major: UInt8,
         minor: UInt8,
-    ) -> UInt8 {
+    ) throws -> UInt8 {
         var byte: UInt8 = 0
 
         switch major {
@@ -60,7 +61,7 @@ enum Hex {
         case UInt8(ascii: "a") ... UInt8(ascii: "f"):
             byte = (major - UInt8(ascii: "a") + 10) << 4
         default:
-            preconditionFailure()
+            throw TraceParentDecodingError(.invalidCharacter(major))
         }
 
         switch minor {
@@ -69,7 +70,7 @@ enum Hex {
         case UInt8(ascii: "a") ... UInt8(ascii: "f"):
             byte |= (minor - UInt8(ascii: "a") + 10)
         default:
-            preconditionFailure()
+            throw TraceParentDecodingError(.invalidCharacter(minor))
         }
 
         return byte

@@ -69,8 +69,8 @@ public struct TraceContext: Sendable {
         // trace ID
 
         var traceID = TraceID.null
-        traceID.withMutableSpan { span in
-            Hex.convert(traceParent[3 ..< 35], toBytes: &span)
+        try traceID.withMutableSpan { span in
+            try Hex.convert(traceParent[3 ..< 35], toBytes: &span)
         }
         if traceID == .null {
             throw TraceParentDecodingError(
@@ -81,8 +81,8 @@ public struct TraceContext: Sendable {
         // span ID
 
         var spanID = SpanID.null
-        spanID.withMutableSpan { span in
-            Hex.convert(traceParent[36 ..< 52], toBytes: &span)
+        try spanID.withMutableSpan { span in
+            try Hex.convert(traceParent[36 ..< 52], toBytes: &span)
         }
         if spanID == .null {
             throw TraceParentDecodingError(
@@ -92,7 +92,7 @@ public struct TraceContext: Sendable {
 
         // flags
 
-        let traceFlagsRawValue = Hex.convert(
+        let traceFlagsRawValue = try Hex.convert(
             major: traceParent[53],
             minor: traceParent[54]
         )
@@ -147,6 +147,7 @@ package struct TraceParentDecodingError: Error {
         case invalidTraceParentLength(Int)
         case unsupportedVersion(String)
         case invalidDelimiters
+        case invalidCharacter(UInt8)
         case invalidTraceID(String)
         case invalidSpanID(String)
     }
