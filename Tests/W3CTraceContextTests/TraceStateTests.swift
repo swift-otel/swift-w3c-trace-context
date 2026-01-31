@@ -41,7 +41,7 @@ final class TraceStateTests: XCTestCase {
         XCTAssertEqual(
             Array(traceState),
             [
-                TraceState.Element(vendor: vendor, value: value),
+                TraceState.Element(vendor: vendor, value: value)
             ]
         )
 
@@ -148,7 +148,7 @@ final class TraceStateTests: XCTestCase {
         XCTAssertEqual(
             Array(traceState),
             [
-                TraceState.Element(vendor: .simple("vendor"), value: "value"),
+                TraceState.Element(vendor: .simple("vendor"), value: "value")
             ]
         )
     }
@@ -161,7 +161,7 @@ final class TraceStateTests: XCTestCase {
         XCTAssertEqual(
             Array(traceState),
             [
-                TraceState.Element(vendor: .tenant("tenant", in: "system"), value: "value"),
+                TraceState.Element(vendor: .tenant("tenant", in: "system"), value: "value")
             ]
         )
     }
@@ -303,9 +303,10 @@ final class TraceStateTests: XCTestCase {
         } catch let error as TraceStateDecodingError {
             let lowerBound = headerValue.startIndex
             let upperBound = headerValue.index(
-                headerValue.startIndex, offsetBy: maximumAllowedLength
+                headerValue.startIndex,
+                offsetBy: maximumAllowedLength
             )
-            let range = lowerBound ... upperBound
+            let range = lowerBound...upperBound
             XCTAssertEqual(error.reason, .simpleVendorTooLong(range))
             XCTAssertEqual(
                 error.debugDescription,
@@ -331,8 +332,9 @@ final class TraceStateTests: XCTestCase {
                 error.reason,
                 .multiTenantVendorTenantTooLong(
                     headerValue
-                        .startIndex ... headerValue.index(
-                            headerValue.startIndex, offsetBy: maximumAllowedLength
+                        .startIndex...headerValue.index(
+                            headerValue.startIndex,
+                            offsetBy: maximumAllowedLength
                         )
                 )
             )

@@ -39,7 +39,7 @@ final class SpanIDTests: XCTestCase {
     }
 
     func test_identifiableConformance() {
-        let randomSpanIDs = (0 ..< 100).map { _ in SpanID.random().id }
+        let randomSpanIDs = (0..<100).map { _ in SpanID.random().id }
 
         XCTAssertEqual(Set(randomSpanIDs).count, 100)
     }
@@ -61,7 +61,7 @@ final class SpanIDTests: XCTestCase {
     }
 
     func test_random_withDefaultNumberGenerator_returnsRandomSpanIDs() {
-        let randomSpanIDs = (0 ..< 100).map { _ in SpanID.random() }
+        let randomSpanIDs = (0..<100).map { _ in SpanID.random() }
 
         XCTAssertEqual(Set(randomSpanIDs).count, 100)
     }

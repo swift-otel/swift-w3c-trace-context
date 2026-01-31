@@ -58,7 +58,7 @@ public struct TraceContext: Sendable {
 
         // version
         guard traceParent[0] == 48, traceParent[1] == 48 else {
-            let version = String(decoding: traceParent[0 ... 1], as: UTF8.self)
+            let version = String(decoding: traceParent[0...1], as: UTF8.self)
             throw TraceParentDecodingError(.unsupportedVersion(version))
         }
 
@@ -70,11 +70,11 @@ public struct TraceContext: Sendable {
 
         var traceID = TraceID.null
         try traceID.withMutableSpan { span in
-            try Hex.convert(traceParent[3 ..< 35], toBytes: &span)
+            try Hex.convert(traceParent[3..<35], toBytes: &span)
         }
         if traceID == .null {
             throw TraceParentDecodingError(
-                .invalidTraceID(String(decoding: traceParent[3 ..< 35], as: UTF8.self))
+                .invalidTraceID(String(decoding: traceParent[3..<35], as: UTF8.self))
             )
         }
 
@@ -82,11 +82,11 @@ public struct TraceContext: Sendable {
 
         var spanID = SpanID.null
         try spanID.withMutableSpan { span in
-            try Hex.convert(traceParent[36 ..< 52], toBytes: &span)
+            try Hex.convert(traceParent[36..<52], toBytes: &span)
         }
         if spanID == .null {
             throw TraceParentDecodingError(
-                .invalidSpanID(String(decoding: traceParent[36 ..< 52], as: UTF8.self))
+                .invalidSpanID(String(decoding: traceParent[36..<52], as: UTF8.self))
             )
         }
 
@@ -98,11 +98,12 @@ public struct TraceContext: Sendable {
         )
         let flags = TraceFlags(rawValue: traceFlagsRawValue)
 
-        let state: TraceState = if let traceStateHeaderValue, !traceStateHeaderValue.isEmpty {
-            try TraceState(decoding: traceStateHeaderValue)
-        } else {
-            TraceState()
-        }
+        let state: TraceState =
+            if let traceStateHeaderValue, !traceStateHeaderValue.isEmpty {
+                try TraceState(decoding: traceStateHeaderValue)
+            } else {
+                TraceState()
+            }
 
         self = TraceContext(
             traceID: traceID,

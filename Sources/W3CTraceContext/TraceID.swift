@@ -62,7 +62,7 @@ extension TraceID: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.withSpan { lSpan in
             rhs.withSpan { rSpan in
-                for index in 0 ..< 16 {
+                for index in 0..<16 {
                     let lValue = lSpan[index]
                     let rValue = rSpan[index]
                     let elementEquals = lValue == rValue
