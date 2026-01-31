@@ -47,7 +47,7 @@ final class TraceIDTests: XCTestCase {
     }
 
     func test_identifiableConformance() {
-        let randomTraceIDs = (0 ..< 100).map { _ in TraceID.random().id }
+        let randomTraceIDs = (0..<100).map { _ in TraceID.random().id }
 
         XCTAssertEqual(Set(randomTraceIDs).count, 100)
     }
@@ -69,7 +69,7 @@ final class TraceIDTests: XCTestCase {
     }
 
     func test_random_withDefaultNumberGenerator_returnsRandomSpanIDs() {
-        let randomTraceIDs = (0 ..< 100).map { _ in TraceID.random() }
+        let randomTraceIDs = (0..<100).map { _ in TraceID.random() }
 
         XCTAssertEqual(Set(randomTraceIDs).count, 100)
     }

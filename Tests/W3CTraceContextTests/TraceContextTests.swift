@@ -20,12 +20,15 @@ final class TraceContextTests: XCTestCase {
             traceParentHeaderValue: "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
         )
 
-        XCTAssertEqual(traceContext, TraceContext(
-            traceID: TraceID(bytes: (10, 247, 101, 25, 22, 205, 67, 221, 132, 72, 235, 33, 28, 128, 49, 156)),
-            spanID: SpanID(bytes: (183, 173, 107, 113, 105, 32, 51, 49)),
-            flags: .sampled,
-            state: TraceState()
-        ))
+        XCTAssertEqual(
+            traceContext,
+            TraceContext(
+                traceID: TraceID(bytes: (10, 247, 101, 25, 22, 205, 67, 221, 132, 72, 235, 33, 28, 128, 49, 156)),
+                spanID: SpanID(bytes: (183, 173, 107, 113, 105, 32, 51, 49)),
+                flags: .sampled,
+                state: TraceState()
+            )
+        )
     }
 
     func test_decodingHeaderValues_withValidTraceParentAndTraceStateHeaders_returnsDecodedTraceContext() throws {
@@ -34,16 +37,19 @@ final class TraceContextTests: XCTestCase {
             traceStateHeaderValue: "foo=bar,tenant1@system=1,tenant2@system=2"
         )
 
-        XCTAssertEqual(traceContext, TraceContext(
-            traceID: TraceID(bytes: (10, 247, 101, 25, 22, 205, 67, 221, 132, 72, 235, 33, 28, 128, 49, 156)),
-            spanID: SpanID(bytes: (183, 173, 107, 113, 105, 32, 51, 49)),
-            flags: .sampled,
-            state: TraceState([
-                (.simple("foo"), "bar"),
-                (.tenant("tenant1", in: "system"), "1"),
-                (.tenant("tenant2", in: "system"), "2"),
-            ])
-        ))
+        XCTAssertEqual(
+            traceContext,
+            TraceContext(
+                traceID: TraceID(bytes: (10, 247, 101, 25, 22, 205, 67, 221, 132, 72, 235, 33, 28, 128, 49, 156)),
+                spanID: SpanID(bytes: (183, 173, 107, 113, 105, 32, 51, 49)),
+                flags: .sampled,
+                state: TraceState([
+                    (.simple("foo"), "bar"),
+                    (.tenant("tenant1", in: "system"), "1"),
+                    (.tenant("tenant2", in: "system"), "2"),
+                ])
+            )
+        )
     }
 
     func test_decodingHeaderValues_withInvalidCharacterInTraceID_throwsDecodingError() throws {

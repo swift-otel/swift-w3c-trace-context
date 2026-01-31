@@ -56,18 +56,18 @@ enum Hex {
         var byte: UInt8 = 0
 
         switch major {
-        case UInt8(ascii: "0") ... UInt8(ascii: "9"):
+        case UInt8(ascii: "0")...UInt8(ascii: "9"):
             byte = (major - UInt8(ascii: "0")) << 4
-        case UInt8(ascii: "a") ... UInt8(ascii: "f"):
+        case UInt8(ascii: "a")...UInt8(ascii: "f"):
             byte = (major - UInt8(ascii: "a") + 10) << 4
         default:
             throw TraceParentDecodingError(.invalidCharacter(major))
         }
 
         switch minor {
-        case UInt8(ascii: "0") ... UInt8(ascii: "9"):
+        case UInt8(ascii: "0")...UInt8(ascii: "9"):
             byte |= (minor - UInt8(ascii: "0"))
-        case UInt8(ascii: "a") ... UInt8(ascii: "f"):
+        case UInt8(ascii: "a")...UInt8(ascii: "f"):
             byte |= (minor - UInt8(ascii: "a") + 10)
         default:
             throw TraceParentDecodingError(.invalidCharacter(minor))

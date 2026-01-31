@@ -138,13 +138,14 @@ extension TraceState {
             switch state {
             case .tenantOrVendor(let tenantOrVendor):
                 switch next {
-                case "a" ... "z", "0" ... "9", "_", "-", "*", "/":
+                case "a"..."z", "0"..."9", "_", "-", "*", "/":
                     // keep adding to the tenant or vendor part
                     state = .tenantOrVendor(tenantOrVendor + next.utf8)
                 case "@":
                     // transition from tenant to system part
                     guard tenantOrVendor.count <= Constant.maximumTenantLength else {
-                        let tenantRange = headerValue.index(index, offsetBy: -tenantOrVendor.count) ... headerValue.index(before: index)
+                        let tenantRange =
+                            headerValue.index(index, offsetBy: -tenantOrVendor.count)...headerValue.index(before: index)
                         throw TraceStateDecodingError(
                             reason: .multiTenantVendorTenantTooLong(tenantRange),
                             headerValue: headerValue
@@ -156,7 +157,8 @@ extension TraceState {
                     // transition from simple tenant to value part
                     let vendor = String(decoding: tenantOrVendor, as: UTF8.self)
                     guard tenantOrVendor.count <= Constant.maximumSimpleVendorLength else {
-                        let vendorRange = headerValue.index(index, offsetBy: -tenantOrVendor.count) ... headerValue.index(before: index)
+                        let vendorRange =
+                            headerValue.index(index, offsetBy: -tenantOrVendor.count)...headerValue.index(before: index)
                         throw TraceStateDecodingError(
                             reason: .simpleVendorTooLong(vendorRange),
                             headerValue: headerValue
@@ -168,13 +170,14 @@ extension TraceState {
                 }
             case .system(let tenant, let system):
                 switch next {
-                case "a" ... "z", "0" ... "9", "_", "-", "*", "/":
+                case "a"..."z", "0"..."9", "_", "-", "*", "/":
                     state = .system(tenant: tenant, system: system + next.utf8)
                 case "=":
                     // transition from tenant to value part
                     let system = String(decoding: system, as: UTF8.self)
                     guard system.count <= Constant.maximumSystemLength else {
-                        let systemRange = headerValue.index(index, offsetBy: -system.count) ... headerValue.index(before: index)
+                        let systemRange =
+                            headerValue.index(index, offsetBy: -system.count)...headerValue.index(before: index)
                         throw TraceStateDecodingError(
                             reason: .multiTenantVendorSystemTooLong(systemRange),
                             headerValue: headerValue
@@ -193,7 +196,7 @@ extension TraceState {
 
                     entries.append((vendor, String(decoding: valuePart, as: UTF8.self)))
                     state = .tenantOrVendor([])
-                case " " ... "~":
+                case " "..."~":
                     guard valuePart.count < Constant.maximumValueLength else {
                         throw TraceStateDecodingError(
                             reason: .valueTooLong(vendor: vendor),
@@ -239,48 +242,48 @@ package struct TraceStateDecodingError: Error, CustomDebugStringConvertible {
             let index = characterIndex.utf16Offset(in: headerValue)
             let indicator = String(repeating: " ", count: index) + "^"
             return """
-            Trace state vendor contains malformed character.
-            \(headerValue)
-            \(indicator)
-            """
+                Trace state vendor contains malformed character.
+                \(headerValue)
+                \(indicator)
+                """
         case .malformedCharacterInValue(let characterIndex):
             let index = characterIndex.utf16Offset(in: headerValue)
             let indicator = String(repeating: " ", count: index) + "^"
             return """
-            Trace state value contains malformed character.
-            \(headerValue)
-            \(indicator)
-            """
+                Trace state value contains malformed character.
+                \(headerValue)
+                \(indicator)
+                """
         case .simpleVendorTooLong(let vendorRange):
             let endIndex = vendorRange.upperBound.utf16Offset(in: headerValue)
             let indicator = String(repeating: " ", count: endIndex) + "^"
             return """
-            Vendor in trace state exceeds maximum allowed length of \(TraceState.Constant.maximumSimpleVendorLength).
-            \(headerValue)
-            \(indicator)
-            """
+                Vendor in trace state exceeds maximum allowed length of \(TraceState.Constant.maximumSimpleVendorLength).
+                \(headerValue)
+                \(indicator)
+                """
         case .multiTenantVendorTenantTooLong(let tenantRange):
             let endIndex = tenantRange.upperBound.utf16Offset(in: headerValue)
             let indicator = String(repeating: " ", count: endIndex) + "^"
             return """
-            Tenant in trace state exceeds maximum allowed length of \(TraceState.Constant.maximumTenantLength).
-            \(headerValue)
-            \(indicator)
-            """
+                Tenant in trace state exceeds maximum allowed length of \(TraceState.Constant.maximumTenantLength).
+                \(headerValue)
+                \(indicator)
+                """
         case .multiTenantVendorSystemTooLong(let systemRange):
             let endIndex = systemRange.upperBound.utf16Offset(in: headerValue)
             let indicator = String(repeating: " ", count: endIndex) + "^"
             return """
-            Multi-tenant system ID in trace state exceeds maximum allowed length of \
-            \(TraceState.Constant.maximumTenantLength).
-            \(headerValue)
-            \(indicator)
-            """
+                Multi-tenant system ID in trace state exceeds maximum allowed length of \
+                \(TraceState.Constant.maximumTenantLength).
+                \(headerValue)
+                \(indicator)
+                """
         case .valueTooLong(let vendor):
             return """
-            Value for vendor "\(vendor)" exceeds maximum allowed length of \
-            \(TraceState.Constant.maximumValueLength).
-            """
+                Value for vendor "\(vendor)" exceeds maximum allowed length of \
+                \(TraceState.Constant.maximumValueLength).
+                """
         }
     }
 

@@ -1,57 +1,45 @@
 name: "CI"
 on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-ci
+  cancel-in-progress: true
+
 jobs:
   soundness:
-    name: Soundness Check
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.2
-
-      - name: Bootstrap Mint
-        uses: irgaly/setup-mint@v1
-
-      - name: Run soundness
-        run: |
-          scripts/soundness.sh
-          exit $(git status --porcelain | wc -l)
+    name: Soundness
+    uses: swiftlang/github-workflows/.github/workflows/soundness.yml@main
+    with:
+      python_lint_check_enabled: false
 
   unit-test:
-    name: Unit Test
-    runs-on: ubuntu-22.04
+    name: Unit Test (Swift ${{ matrix.swift.version }})
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        swift: ["6.2", "latest"]
+        swift:
+          - version: "6.2"
+            image: swift:6.2-rhel-ubi9
+
+    container:
+      image: ${{ matrix.swift.image }}
 
     steps:
-      - name: Install Swift
-        uses: vapor/swiftly-action@v0.2
-        with:
-          toolchain: ${{ matrix.swift }}
-        env:
-          SWIFTLY_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
-      - name: Cache Swift PM
-        uses: actions/cache@v5.0.2
-        with:
-          path: .build
-          key: ${{ runner.os }}-${{ matrix.swift }}-ci-spm-${{ hashFiles('Package.swift') }}
-          restore-keys: ${{ runner.os }}-${{ matrix.swift }}-ci-spm-
-
       - name: Resolve Swift dependencies
         run: swift package resolve
+
+      - name: Build package and tests
+        run: swift build --build-tests -Xswiftc -warnings-as-errors --enable-code-coverage
 
       - name: Run Unit Tests
         run: swift test --parallel --enable-code-coverage
 
       - name: Merge code coverage
-        if: matrix.swift == 'latest'
         run: |
           llvm-cov export -format "lcov" \
             .build/debug/swift-w3c-trace-contextPackageTests.xctest \
@@ -61,9 +49,6 @@ jobs:
           > info.lcov
 
       - name: Upload code coverage report to Codecov
-        if: matrix.swift == 'latest'
-        uses: codecov/codecov-action@v5
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/codecov-action@v5.5.1
         with:
           files: ./info.lcov
