@@ -49,6 +49,6 @@ jobs:
           > info.lcov
 
       - name: Upload code coverage report to Codecov
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@v6.0.0
         with:
           files: ./info.lcov
